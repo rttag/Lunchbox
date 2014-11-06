@@ -75,6 +75,10 @@ set(LUNCHBOX_DEFINITIONS ${LUNCHBOX_DEFINITIONS}
     -DLUNCHBOX_BUILD_DIR="${CMAKE_BINARY_DIR}/")
 add_definitions(${LUNCHBOX_DEFINITIONS})
 
+# http://gcc.gnu.org/bugzilla/show_bug.cgi?id=51721
+# disabling the warning in the code doesn't work with Werror
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=array-bounds")
+
 include(InstallSymlink)
 include(pthreads/CMakeLists.txt)
 
