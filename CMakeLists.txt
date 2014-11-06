@@ -77,7 +77,9 @@ add_definitions(${LUNCHBOX_DEFINITIONS})
 
 # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=51721
 # disabling the warning in the code doesn't work with Werror
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=array-bounds")
+if(CMAKE_COMPILER_IS_GNUCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=array-bounds")
+endif()
 
 include(InstallSymlink)
 include(pthreads/CMakeLists.txt)
