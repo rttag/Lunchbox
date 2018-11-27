@@ -19,6 +19,8 @@ set(VERSION_MINOR "7")
 set(VERSION_PATCH "5")
 set(LUNCHBOX_FEATURES)
 
+add_definitions(-D_TIMESPEC_DEFINED)
+
 if(CMAKE_OSX_DEPLOYMENT_TARGET)
   set(LUNCHBOX_OSX_VERSION ${CMAKE_OSX_DEPLOYMENT_TARGET})
 else()
@@ -73,7 +75,8 @@ endif()
 
 set(LUNCHBOX_DEFINITIONS ${LUNCHBOX_DEFINITIONS}
     -DLUNCHBOX_BUILD_DIR="${CMAKE_BINARY_DIR}/")
-add_definitions(${LUNCHBOX_DEFINITIONS})
+add_definitions(${LUNCHBOX_DEFINITIONS} -D_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS -wd4091)
+
 
 # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=51721
 # disabling the warning in the code doesn't work with Werror

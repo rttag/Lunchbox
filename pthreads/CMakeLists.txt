@@ -5,6 +5,9 @@ find_package(Threads REQUIRED)
 
 set(PTHREAD_LIBRARIES pthread)
 
+add_definitions(-D_TIMESPEC_DEFINED)
+
+
 if(CMAKE_USE_PTHREADS_INIT)
   return()
 endif(CMAKE_USE_PTHREADS_INIT)
