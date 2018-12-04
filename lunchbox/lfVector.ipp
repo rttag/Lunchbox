@@ -99,7 +99,7 @@ LFVector< T, nSlots >::operator = ( const LFVector< T, nSlots >& from )
     {
         if( from.slots_[i] )
         {
-            const size_t sz = 1<<i;
+            const size_t sz = 1ull<<i;
             if( !slots_[ i ] )
                 slots_[ i ] = new T[ sz ];
 
