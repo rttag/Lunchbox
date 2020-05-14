@@ -8,6 +8,7 @@ if(NOT WIN32) # tests want to be with DLLs on Windows - no rpath
 endif()
 
 include_directories(
+  ${Boost_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR} # some tests need private headers
   )
