@@ -4,6 +4,8 @@
 include(configure.cmake)
 include(files.cmake)
 
+include_directories(${Boost_INCLUDE_DIR})
+
 add_definitions(-DEQ_PLUGIN_BUILD)
 
 set(LUNCHBOX_LINKLIBS ${PTHREAD_LIBRARIES} ${Boost_LIBRARIES})
