@@ -29,7 +29,12 @@
 #define N_THREADS 10
 
 typedef lunchbox::uint128_t uint128_t;
+#if _MSC_VER < 1920
 typedef stde::hash_map< uint128_t, bool > TestHash;
+#else
+#include <unordered_map>
+typedef std::unordered_map< uint128_t, bool > TestHash;
+#endif
 
 void testConvertUint128ToUUID();
 void testIncrement();

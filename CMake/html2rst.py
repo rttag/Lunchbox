@@ -23,8 +23,8 @@ README.txt
 #   Support decoded entities with unifiable.
 #    Relative URL resolution
 
-if not hasattr(__builtins__, 'True'): True, False = 1, 0
-import re, sys, urllib, htmlentitydefs, codecs, StringIO, types
+#if not hasattr(__builtins__, 'True'): True, False = 1, 0
+import re, sys, urllib.request, urllib.parse, urllib.error, html.entities, codecs, io, types
 import sgmllib
 sgmllib.charref = re.compile('&#([xX]?[0-9a-fA-F]+)[^0-9a-fA-F]')
 
@@ -44,10 +44,10 @@ BODY_WIDTH = 0
 
 def name2cp(k):
     if k == 'apos': return ord("'")
-    if hasattr(htmlentitydefs, "name2codepoint"): # requires Python 2.3
-        return htmlentitydefs.name2codepoint[k]
+    if hasattr(html.entities, "name2codepoint"): # requires Python 2.3
+        return html.entities.name2codepoint[k]
     else:
-        k = htmlentitydefs.entitydefs[k]
+        k = html.entities.entitydefs[k]
         if k.startswith("&#") and k.endswith(";"): return int(k[2:-1]) # not in latin-1
         return ord(codecs.latin_1_decode(k)[0])
 
@@ -62,7 +62,7 @@ unifiable = {'rsquo':"'", 'lsquo':"'", 'rdquo':'"', 'ldquo':'"',
 
 unifiable_n = {}
 
-for k in unifiable.keys():
+for k in list(unifiable.keys()):
     unifiable_n[name2cp(k)] = unifiable[k]
 
 def charref(name):
@@ -71,18 +71,18 @@ def charref(name):
     else:
         c = int(name)
     
-    if not UNICODE_SNOB and c in unifiable_n.keys():
+    if not UNICODE_SNOB and c in list(unifiable_n.keys()):
         return unifiable_n[c]
     else:
-        return unichr(c)
+        return chr(c)
 
 def entityref(c):
-    if not UNICODE_SNOB and c in unifiable.keys():
+    if not UNICODE_SNOB and c in list(unifiable.keys()):
         return unifiable[c]
     else:
         try: name2cp(c)
         except KeyError: return "&" + c
-        else: return unichr(name2cp(c))
+        else: return chr(name2cp(c))
 
 def replaceEntities(s):
     s = s.group(1)
@@ -151,7 +151,7 @@ class _html2text(sgmllib.SGMLParser):
         
         if out is None: self.out = self.outtextf
         else: self.out = out
-        self.outtext = u''
+        self.outtext = ''
         self.quiet = 0
         self.p_p = 0
         self.outcount = 0
@@ -170,7 +170,7 @@ class _html2text(sgmllib.SGMLParser):
         """required to keep indent after unbalanced <li>s"""
     
     def outtextf(self, s): 
-        if type(s) is type(''): s = codecs.utf_8_decode(s)[0]
+        #if type(s) is type(''): s = codecs.utf_8_decode(s)[0]
         self.outtext += s
     
     def close(self):
@@ -199,16 +199,16 @@ class _html2text(sgmllib.SGMLParser):
  
              If the set of attributes is not found, returns None
          """
-         if not attrs.has_key('href'): return None
+         if 'href' not in attrs: return None
          
          i = -1
          for a in self.a:
              i += 1
              match = 0
              
-             if a.has_key('href') and a['href'] == attrs['href']:
-                 if a.has_key('title') or attrs.has_key('title'):
-                         if (a.has_key('title') and attrs.has_key('title') and
+             if 'href' in a and a['href'] == attrs['href']:
+                 if 'title' in a or 'title' in attrs:
+                         if ('title' in a and 'title' in attrs and
                             a['title'] == attrs['title']):
                              match = True
                  else:
@@ -262,7 +262,7 @@ class _html2text(sgmllib.SGMLParser):
                 attrsD = {}
                 for (x, y) in attrs: attrsD[x] = y
                 attrs = attrsD
-                if attrs.has_key('href'):
+                if 'href' in attrs:
                     self.astack.append(attrs)
                     self.o("`")
                 else:
@@ -282,7 +282,7 @@ class _html2text(sgmllib.SGMLParser):
             attrsD = {}
             for (x, y) in attrs: attrsD[x] = y
             attrs = attrsD
-            if attrs.has_key('src'):
+            if 'src' in attrs:
                 #~ attrs['href'] = attrs['src']
                 alt = attrs.get('alt', '')
                 #~ i = self.previousIndex(attrs)
@@ -389,7 +389,7 @@ class _html2text(sgmllib.SGMLParser):
                 for link in self.a:
                     if self.outcount > link['outcount']:
                         self.out(".. _"+link['data']+": " + link['href']) #TODO: base href
-                        if link.has_key('title'): self.out(" ("+link['title']+")")
+                        if 'title' in link: self.out(" ("+link['title']+")")
                         self.out("\n")
                     else:
                         newa.append(link)
@@ -439,11 +439,12 @@ if __name__ == "__main__":
     if sys.argv[1:]:
         arg = sys.argv[1]
         if arg.startswith('http://'):
-            data = urllib.urlopen(arg).read()
+            data = urllib.request.urlopen(arg).read()
         else:
             data = open(arg, 'r').read()
     else:
         data = sys.stdin.read()
     #~ html2text_file(data)
     rest = optwrap(html2text_file(data, None))
-    sys.stdout.write(rest.encode('ascii', 'replace'))
+    #sys.stdout.write(rest.encode('ascii', 'replace'))
+    sys.stdout.write(rest)

@@ -167,6 +167,7 @@ LB_STDEXT_NAMESPACE_OPEN
 #endif // LB_STDEXT_EXT
 
 #ifdef LB_STDEXT_MSVC
+#if _MSC_VER < 1920
 #  ifndef LB_HAVE_STRING_HASH
 
     /** std::string hash function. @version 1.0 */
@@ -200,6 +201,7 @@ LB_STDEXT_NAMESPACE_OPEN
         return static_cast< size_t >( key.high() ^ key.low() );
     }
 
+#endif
 #else // MSVC
 
     /** uint128_t hash function. @version 1.0 */
@@ -260,5 +262,22 @@ LB_STDEXT_NAMESPACE_OPEN
         { return std::find_if( container.begin(), container.end(), predicate );}
 
 LB_STDEXT_NAMESPACE_CLOSE
+
+#if _MSC_VER > 1916
+namespace std {
+	template <>
+	struct std::hash<lunchbox::UUID> {
+		std::size_t operator()(const lunchbox::UUID& obj) const {
+            return static_cast<size_t>(std::hash<uint64_t>{}(obj.high()) ^ std::hash<uint64_t>{}(obj.low()));
+		}
+	};
+	template <>
+	struct std::hash<lunchbox::uint128_t> {
+		std::size_t operator()(const lunchbox::uint128_t& obj) const {
+			return static_cast<size_t>(std::hash<uint64_t>{}(obj.high()) ^ std::hash<uint64_t>{}(obj.low()));
+		}
+	};
+}
+#endif
 
 #endif // LUNCHBOX_STDEXT_H
